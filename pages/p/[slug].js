@@ -80,8 +80,10 @@ export default function PageViewProduct({ data, slug }) {
 									productDescription={data.description}
 									productAvaiable={data.avaiable}
 									productOwner={data.owner}
+									productImage={data.image}
 									value={value}
 									setValue={setValue}
+									data={data}
 									slug={slug}
 								/>
 							</Grid>

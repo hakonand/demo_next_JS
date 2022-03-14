@@ -107,7 +107,7 @@ MainSidebar.propTypes = {
 export default function MainSidebar({ isOpenSidebar, onCloseSidebar }) {
 	const theme = useTheme()
 
-	const { user, cart } = useContext(AuthContext)
+	const { user, cart, userInfo } = useContext(AuthContext)
 
 	const loggedInItems = [
 		{

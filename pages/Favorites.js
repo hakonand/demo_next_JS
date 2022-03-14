@@ -26,7 +26,7 @@ import firebase from 'src/firebase/firebase'
 // ----------------------------------------------------------------------
 
 export default function Favorites() {
-	const { user, logoutUser, favorites, removeFromFavorites } =
+	const { user, favorites, removeFromFavorites, userInfo } =
 		useContext(AuthContext)
 
 	const theme = useTheme()
@@ -147,7 +147,7 @@ export default function Favorites() {
 						))
 					)}
 
-					<Button onClick={() => console.log(favorites)}>log out</Button>
+					<Button onClick={() => console.log(userInfo)}>log out</Button>
 				</Grid>
 			</Page>
 		</MainLayout>

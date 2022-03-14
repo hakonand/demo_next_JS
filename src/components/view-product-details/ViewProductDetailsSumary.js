@@ -74,6 +74,8 @@ export default function ViewProductDetailsSummary({
 	ownerQueryName,
 	value,
 	setValue,
+	productImage,
+	data,
 	slug,
 	...other
 }) {
@@ -90,14 +92,20 @@ export default function ViewProductDetailsSummary({
 	const [openSnackBar, setOpenSnackBar] = useState(false)
 
 	useEffect(() => {
-		setSelectedSize(productSizes[0])
+		setSelectedSize(data.sizes[0])
 	}, [])
 
-	const { user, updateFavorites, favorites, removeFromFavorites, updateCart } =
-		useContext(AuthContext)
+	const {
+		user,
+		updateFavorites,
+		favorites,
+		removeFromFavorites,
+		updateCart,
+		userInfo,
+	} = useContext(AuthContext)
 
 	const handleAddCart = () => {
-		updateCart(slug, qty, selectedSize, productPrice)
+		updateCart(slug, qty, selectedSize, data)
 		setOpenSnackBar(true)
 	}
 
@@ -157,17 +165,17 @@ export default function ViewProductDetailsSummary({
 		<RootStyle {...other}>
 			<Grid container spacing={2}>
 				<Grid item xs={12}>
-					<Typography variant='h5'>{productName}</Typography>
+					<Typography variant='h5'>{data.name}</Typography>
 				</Grid>
 				<Grid item xs={12}>
 					<Typography paragraph variant='overline' color='text.secondary'>
-						{productOwner}
+						{data.owner}
 					</Typography>
 				</Grid>
 
 				<Grid item xs={12}>
 					<Typography variant='subtitle1'>
-						{productPrice.toLocaleString('en-US', {
+						{data.price.toLocaleString('en-US', {
 							style: 'currency',
 							currency: 'NOK',
 						})}
@@ -184,7 +192,7 @@ export default function ViewProductDetailsSummary({
 							onChange={(e) => setSelectedSize(e.target.value)}
 							fullWidth
 						>
-							{productSizes.map((size) => (
+							{data.sizes.map((size) => (
 								<MenuItem key={size} value={size}>
 									{size}
 								</MenuItem>
@@ -200,7 +208,7 @@ export default function ViewProductDetailsSummary({
 				<br />
 				{showMore ? (
 					<Grid item xs={12}>
-						{productDescription.substring(0, 100)} ...
+						{data.description.substring(0, 100)} ...
 						<Button
 							type='text'
 							color='secondary'
@@ -211,7 +219,7 @@ export default function ViewProductDetailsSummary({
 					</Grid>
 				) : (
 					<Grid item xs={12}>
-						{productDescription}
+						{data.description}
 						<Button
 							type='text'
 							color='secondary'
@@ -248,21 +256,20 @@ export default function ViewProductDetailsSummary({
 						onClick={handleAddCart}
 						sx={{ my: theme.spacing(3) }}
 					>
-						Add to Cartt
+						Add to Cart
 					</Button>
 				</Grid>
 				<Snackbar
 					open={openSnackBar}
 					autoHideDuration={5000}
 					onClose={handleCloseSnackbar}
-					anchorOrigin={{ horizontal: 'bottom', vertical: 'center' }}
+					anchorOrigin={{ horizontal: 'center', vertical: 'bottom' }}
 					severity='success'
 				>
 					<Alert
 						onClose={handleCloseSnackbar}
 						severity='success'
-						sx={{ width: '100%' }}
-						sx={{ textColor: '#FFFFF' }}
+						sx={{ textColor: '#FFFFF', width: '100%' }}
 						color='primary'
 					>
 						Added to cart

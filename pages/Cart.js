@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect } from 'react'
+import { useState, useContext, useEffect, useReducer } from 'react'
 
 import {
 	Container,
@@ -9,6 +9,7 @@ import {
 	Stack,
 	Box,
 	IconButton,
+	Tooltip,
 	Divider,
 } from '@mui/material'
 import Image from 'next/image'
@@ -42,7 +43,7 @@ export default function Favorites() {
 	return (
 		<MainLayout>
 			<Page title='cart | markd'>
-				<Grid container spacing={1}>
+				<Grid container spacing={1} p={3}>
 					<Grid item xs={12} mb={5}>
 						<Stack
 							justifyContent='center'
@@ -59,7 +60,89 @@ export default function Favorites() {
 						</Stack>
 					</Grid>
 
-					<Button onClick={() => console.log(cart)}>log out</Button>
+					<Grid container spacing={2}>
+						{cart.map((item, index) => (
+							<Grid container spacing={2} mt={5} key={item.ownerId}>
+								<Grid item xs={12}>
+									<Stack alignItems='center' justifyContent='center'>
+										<Typography variant='h6'>
+											Shop from {item.ownerName}
+										</Typography>
+									</Stack>
+								</Grid>
+
+								{item.products.map((option, index) => (
+									<Grid item xs={6} sm={4} key={index}>
+										<CardActionArea
+											onClick={() => router.push(`/p/${option.id}`)}
+										>
+											<Box sx={{ position: 'relative', display: 'block' }}>
+												<Image
+													src={option.image}
+													alt={option.name}
+													layout='intrinsic'
+													width={500}
+													height={500}
+													quality='100'
+													priority
+												/>
+											</Box>
+
+											<Stack
+												direction={{ xs: 'column', md: 'row' }}
+												justifyContent='space-between'
+												sx={{ mt: theme.spacing(1) }}
+											>
+												<Typography variant='subtitle1'>
+													{option.name}
+												</Typography>
+												<Typography variant='body2'>{option.owner}</Typography>
+											</Stack>
+										</CardActionArea>
+										<Stack direction='row' justifyContent='space-between'>
+											<Typography
+												variant='body2'
+												sx={{ mt: theme.spacing(1.5) }}
+											>
+												{option.price} NOK
+											</Typography>
+
+											{!user ? (
+												<Tooltip title='Log in to save favorites'>
+													<IconButton>
+														<FavoriteBorderOutlinedIcon />
+													</IconButton>
+												</Tooltip>
+											) : favorites.includes(option.id) ? (
+												<IconButton
+													onClick={() => removeFromFavorites(option.id)}
+													color='error'
+												>
+													<FavoriteIcon color='error' />
+												</IconButton>
+											) : (
+												<IconButton onClick={() => updateFavorites(option.id)}>
+													<FavoriteBorderOutlinedIcon />
+												</IconButton>
+											)}
+										</Stack>
+									</Grid>
+								))}
+								<Grid item xs={12}>
+									<Stack alignItems='center' justifyContent='center'>
+										<Button
+											variant='contained'
+											color='success'
+											size='large'
+											onClick={() => console.log(cart)}
+										>
+											Check out from {item.ownerName}
+										</Button>
+									</Stack>
+								</Grid>
+							</Grid>
+						))}
+					</Grid>
 				</Grid>
 			</Page>
 		</MainLayout>

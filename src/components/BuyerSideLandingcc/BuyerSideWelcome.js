@@ -142,7 +142,7 @@ export default function BuyerSideWelcome({ user, maincats }) {
 					{user ? Welcome : NewUser}
 				</Grid>
 
-				<Grid item xs={12} sm={4}>
+				<Grid item xs={12} sm={5} md={4}>
 					<MHidden width='smDown'>
 						<BuyerSideWelcomeCarousel maincats={maincats} />
 					</MHidden>

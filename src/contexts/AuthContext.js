@@ -5,10 +5,11 @@ import { useRouter } from 'next/router'
 export const AuthContext = React.createContext()
 
 export const AuthProvider = ({ children }) => {
-	const [user, setUser] = useState(null)
 	const [userInfo, setUserInfo] = useState()
 	const [favorites, setFavorites] = useState([])
 	const [cart, setCart] = useState([])
+
+	const user = firebase.auth().currentUser
 
 	const [errorMessage, setErrorMessage] = useState('')
 
@@ -21,7 +22,7 @@ export const AuthProvider = ({ children }) => {
 		firebase
 			.firestore()
 			.collection('users')
-			.doc(user)
+			.doc(user.uid)
 			.update({
 				favorites: firebase.firestore.FieldValue.arrayUnion(productId),
 			})
@@ -35,24 +36,56 @@ export const AuthProvider = ({ children }) => {
 			})
 	}
 
-	const updateCart = async (productId, qty, selectedSize, price) => {
+	const updateCart = async (productId, qty, selectedSize, data) => {
 		let newArray = [...cart]
 
-		let cartObject = {
+		let productObject = {
 			id: productId,
 			quantity: qty,
 			size: selectedSize,
-			price: price,
+			price: data.price,
+			ownerId: data.owner_query_name,
+			ownerName: data.owner,
+			image: data.image,
+			name: data.name,
+			owner: data.owner,
 		}
 
-		newArray.push(cartObject)
-		setCart(newArray)
+		let merchantObject = {
+			ownerId: data.owner_query_name,
+			ownerName: data.owner,
+			products: [
+				{
+					id: productId,
+					quantity: qty,
+					size: selectedSize,
+					price: data.price,
+					ownerId: data.owner_query_name,
+					ownerName: data.owner,
+					image: data.image,
+					name: data.name,
+					owner: data.owner,
+				},
+			],
+		}
+
+		const foundIndex = newArray.findIndex(
+			(x) => x.ownerId === data.owner_query_name
+		)
+
+		if (foundIndex >= 0) {
+			newArray[foundIndex].products.push(productObject)
+			setCart(newArray)
+		} else if (foundIndex === -1) {
+			newArray.push(merchantObject)
+			setCart(newArray)
+		}
 
 		if (user) {
 			firebase
 				.firestore()
 				.collection('users')
-				.doc(user)
+				.doc(user.uid)
 				.update({
 					cart: newArray,
 				})
@@ -75,7 +108,7 @@ export const AuthProvider = ({ children }) => {
 		firebase
 			.firestore()
 			.collection('users')
-			.doc(user)
+			.doc(user.uid)
 			.update({
 				favorites: firebase.firestore.FieldValue.arrayRemove(productId),
 			})
@@ -98,8 +131,6 @@ export const AuthProvider = ({ children }) => {
 					displayName: name,
 					email: email,
 				})
-				setUser(userCredentials.user)
-				console.log({ user })
 
 				firebase
 					.firestore()
@@ -129,7 +160,6 @@ export const AuthProvider = ({ children }) => {
 			.auth()
 			.signInWithEmailAndPassword(email, password)
 			.then((userCredentials) => {
-				setUser(userCredentials.user.uid)
 				setErrorMessage('')
 				firebase
 					.firestore()
@@ -155,9 +185,9 @@ export const AuthProvider = ({ children }) => {
 			.auth()
 			.signOut()
 			.then(() => {
-				setUser(null)
 				setUserInfo(null)
 				setFavorites([])
+				setCart([])
 				console.log(user)
 			})
 	}
