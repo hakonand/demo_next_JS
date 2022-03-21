@@ -54,6 +54,7 @@ export const AuthProvider = ({ children }) => {
 		let merchantObject = {
 			ownerId: data.owner_query_name,
 			ownerName: data.owner,
+			connectedAccountId: data.connected_account_id,
 			products: [
 				{
 					id: productId,
